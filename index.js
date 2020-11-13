@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes} from 'react-native';
+import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes, NativeModules } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
+
+const { VideoPlayerManager } = NativeModules;
 
 const BackgroundImage = ImageBackground || Image; // fall back to Image if RN < 0.46
 
@@ -231,7 +233,12 @@ export default class VideoPlayer extends Component {
   }
 
   onToggleFullScreen() {
-    this.player.presentFullscreenPlayer();
+    const { video } = this.props;
+    if (Platform.OS === 'ios') {
+      this.player.presentFullscreenPlayer();
+    } else if (videoPlayerManager) {
+      VideoPlayerManager.showVideoPlayer(video.uri);
+    }
   }
 
   onSeekBarLayout({ nativeEvent }) {
@@ -429,7 +436,7 @@ export default class VideoPlayer extends Component {
   }
 
   renderControls() {
-    const { customStyles } = this.props;
+    const { customStyles, showFullscreenAndroid, disableFullscreen } = this.props;
     return (
       <View style={[styles.controls, customStyles.controls]}>
         <TouchableOpacity
@@ -452,7 +459,7 @@ export default class VideoPlayer extends Component {
             />
           </TouchableOpacity>
         )}
-        {(Platform.OS === 'android' || this.props.disableFullscreen) ? null : (
+        {((Platform.OS === 'android' && !videoPlayerManager) || disableFullscreen) ? null : (
           <TouchableOpacity onPress={this.onToggleFullScreen} style={customStyles.controlButton}>
             <Icon
               style={[styles.extraControl, customStyles.controlIcon]}
