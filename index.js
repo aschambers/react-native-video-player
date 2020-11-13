@@ -236,7 +236,7 @@ export default class VideoPlayer extends Component {
     const { video } = this.props;
     if (Platform.OS === 'ios') {
       this.player.presentFullscreenPlayer();
-    } else if (videoPlayerManager) {
+    } else if (VideoPlayerManager) {
       VideoPlayerManager.showVideoPlayer(video.uri);
     }
   }
@@ -436,7 +436,7 @@ export default class VideoPlayer extends Component {
   }
 
   renderControls() {
-    const { customStyles, showFullscreenAndroid, disableFullscreen } = this.props;
+    const { customStyles, disableFullscreen } = this.props;
     return (
       <View style={[styles.controls, customStyles.controls]}>
         <TouchableOpacity
@@ -459,7 +459,7 @@ export default class VideoPlayer extends Component {
             />
           </TouchableOpacity>
         )}
-        {((Platform.OS === 'android' && !videoPlayerManager) || disableFullscreen) ? null : (
+        {((Platform.OS === 'android' && !VideoPlayerManager) || disableFullscreen) ? null : (
           <TouchableOpacity onPress={this.onToggleFullScreen} style={customStyles.controlButton}>
             <Icon
               style={[styles.extraControl, customStyles.controlIcon]}
